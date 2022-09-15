@@ -7,7 +7,7 @@
     @method('PUT')
     @include('posts.partials.form')
     <div class="d-grid gap-2 mt-3">
-      <input type="submit" value="Create" class="btn btn-primary">
+      <input type="submit" value="Update" class="btn btn-primary">
     </div>
   </form>
 @endsection
