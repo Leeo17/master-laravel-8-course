@@ -6,24 +6,24 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BlogPostFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
-    {
-        return [
-            'title' => $this->faker->sentence(10),
-            'content' => $this->faker->paragraphs(5, true)
-        ];
-    }
+  /**
+   * Define the model's default state.
+   *
+   * @return array
+   */
+  public function definition()
+  {
+    return [
+      'title' => $this->faker->sentence(10),
+      'content' => $this->faker->paragraphs(5, true)
+    ];
+  }
 
-    public function newTitle()
-    {
-        return $this->state([
-            'title' => 'New title',
-            'content' => 'Content of the blog post',
-        ]);
-    }
+  public function newTitle()
+  {
+    return $this->state([
+      'title' => 'New title',
+      'content' => 'Content of the blog post',
+    ]);
+  }
 }
