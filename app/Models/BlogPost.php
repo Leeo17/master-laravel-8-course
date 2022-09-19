@@ -31,4 +31,9 @@ class BlogPost extends Model
       $blogPost->comments()->restore();
     });
   }
+
+  public function user()
+  {
+    return $this->belongsTo(User::class);
+  }
 }

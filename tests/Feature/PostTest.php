@@ -142,7 +142,8 @@ class PostTest extends TestCase
   public function testUpdateValid()
   {
     // Arrange
-    $post = $this->createDummyBlogPost();
+    $user = $this->user();
+    $post = $this->createDummyBlogPost($user->id);
 
     $this->assertDatabaseHas('blog_posts', [
       'title' => 'New title',
@@ -155,7 +156,7 @@ class PostTest extends TestCase
     ];
 
     // Act
-    $this->actingAs($this->user())
+    $this->actingAs($user)
       ->put("/posts/{$post->id}", $params)
       ->assertStatus(302)
       ->assertSessionHas('status');
@@ -176,14 +177,15 @@ class PostTest extends TestCase
 
   public function testDelete()
   {
-    $post = $this->createDummyBlogPost();
+    $user = $this->user();
+    $post = $this->createDummyBlogPost($user->id);
 
     $this->assertDatabaseHas('blog_posts', [
       'title' => 'New title',
       'content' => 'Content of the blog post'
     ]);
 
-    $this->actingAs($this->user())
+    $this->actingAs($user)
       ->delete("/posts/{$post->id}")
       ->assertStatus(302)
       ->assertSessionHas('status');
@@ -195,10 +197,64 @@ class PostTest extends TestCase
     ]);
   }
 
-  private function createDummyBlogPost(): BlogPost
+  public function testDeleteNotAuthorized()
+  {
+    $user = $this->user();
+    $post = $this->createDummyBlogPost();
+
+    $this->assertDatabaseHas('blog_posts', [
+      'title' => 'New title',
+      'content' => 'Content of the blog post'
+    ]);
+
+    $this->actingAs($user)
+      ->delete("/posts/{$post->id}")
+      ->assertStatus(403);
+
+    $this->assertDatabaseHas('blog_posts', [
+      'title' => 'New title',
+      'content' => 'Content of the blog post'
+    ]);
+  }
+
+  public function testUpdateNotAuthorized()
   {
     // Arrange
-    $post = BlogPost::factory()->newTitle()->create();
+    $user = $this->user();
+    $post = $this->createDummyBlogPost();
+
+    $this->assertDatabaseHas('blog_posts', [
+      'title' => 'New title',
+      'content' => 'Content of the blog post'
+    ]);
+
+    $params = [
+      'title' => 'Updated title',
+      'content' => 'Updated content of the blog post'
+    ];
+
+    // Act
+    $this->actingAs($user)
+      ->put("/posts/{$post->id}", $params)
+      ->assertStatus(403);
+
+    // Assert
+    $this->assertDatabaseHas('blog_posts', [
+      'title' => 'New title',
+      'content' => 'Content of the blog post'
+    ]);
+
+    $this->assertDatabaseMissing('blog_posts', [
+      'title' => 'Updated title',
+      'content' => 'Updated content of the blog post'
+    ]);
+  }
+
+  private function createDummyBlogPost($userId = null): BlogPost
+  {
+    $post = BlogPost::factory()->newTitle()->create([
+      'user_id' => $userId ?? $this->user()->id,
+    ]);
 
     return $post;
   }
