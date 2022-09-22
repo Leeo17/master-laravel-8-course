@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePost;
 use App\Models\BlogPost;
-use App\Models\User;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Gate;
 
 class PostsController extends Controller
 {
@@ -22,23 +20,9 @@ class PostsController extends Controller
    */
   public function index()
   {
-    $mostCommented = Cache::remember('blog-post-most-commented', 10, function () {
-      return BlogPost::mostCommented()->take(5)->get();
-    });
-
-    $mostActive = Cache::remember('user-most-active', 10, function () {
-      return User::withMostBlogPosts()->take(5)->get();
-    });
-
-    $mostActiveLastMonth = Cache::remember('user-most-active-last-month', 10, function () {
-      return User::withMostBlogPostsLastMonth()->take(5)->get();
-    });
-
     return view('posts.index', [
-      'posts' => BlogPost::latest()->withCount('comments')->with('user')->get(),
-      'mostCommented' => $mostCommented,
-      'mostActive' => $mostActive,
-      'mostActiveLastMonth' => $mostActiveLastMonth
+      'posts' => BlogPost::latest()->withCount('comments')
+        ->with(['user', 'tags'])->get()
     ]);
   }
 
@@ -78,16 +62,8 @@ class PostsController extends Controller
    */
   public function show($id)
   {
-    // abort_if(!isset($this->posts[$id]), 404);
-
-    // return view('posts.show', [
-    //   'post' => BlogPost::with(['comments' => function ($query) {
-    //     return $query->latest();
-    //   }])->findOrFail($id)
-    // ]);
-
     $blogPost = Cache::tags(['blog-post'])->remember("blog-post-{$id}", 60, function () use ($id) {
-      return BlogPost::with('comments')->findOrFail($id);
+      return BlogPost::with(['comments', 'tags', 'user'])->findOrFail($id);
     });
 
     $sessionId = session()->getId();
