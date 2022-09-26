@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Scopes\DeletedAdminScope;
-use App\Scopes\LatestScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -69,5 +68,9 @@ class BlogPost extends Model
   public function tags()
   {
     return $this->belongsToMany(Tag::class)->withTimestamps();
+  }
+
+  public function image() {
+    return $this->hasOne(Image::class);
   }
 }
