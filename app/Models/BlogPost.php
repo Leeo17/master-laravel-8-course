@@ -54,10 +54,11 @@ class BlogPost extends Model
     return $query->withCount('comments')->orderBy('comments_count', 'desc');
   }
 
-  public function scopeLatestWithRelations(Builder $query) {
+  public function scopeLatestWithRelations(Builder $query)
+  {
     return $query->latest()
-        ->withCount('comments')
-        ->with(['user', 'tags']);
+      ->withCount('comments')
+      ->with(['user', 'tags']);
   }
 
   public function user()
@@ -70,7 +71,8 @@ class BlogPost extends Model
     return $this->belongsToMany(Tag::class)->withTimestamps();
   }
 
-  public function image() {
-    return $this->hasOne(Image::class);
+  public function image()
+  {
+    return $this->morphOne(Image::class, 'imageable');
   }
 }

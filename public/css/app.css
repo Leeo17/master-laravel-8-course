@@ -10853,3 +10853,8 @@ textarea.form-control-lg {
 .badge-lg {
   font-size: 1rem;
 }
+
+.avatar {
+  width: 128px;
+  height: 128px;
+}
