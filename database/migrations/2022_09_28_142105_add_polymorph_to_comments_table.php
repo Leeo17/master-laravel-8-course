@@ -6,33 +6,32 @@ use Illuminate\Support\Facades\Schema;
 
 class AddPolymorphToCommentsTable extends Migration
 {
-  /**
-   * Run the migrations.
-   *
-   * @return void
-   */
-  public function up()
-  {
-    Schema::table('comments', function (Blueprint $table) {
-      $table->dropForeign(['blog_post_id']);
-      $table->dropColumn('blog_post_id');
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('comments', function (Blueprint $table) {
+            $table->dropForeign(['blog_post_id']);
+            $table->dropColumn('blog_post_id');
 
-      $table->morphs('commentable');
-    });
-  }
+            $table->morphs('commentable');
+        });
+    }
 
-  /**
-   * Reverse the migrations.
-   *
-   * @return void
-   */
-  public function down()
-  {
-    Schema::table('comments', function (Blueprint $table) {
-      $table->dropMorphs('commentable');
-      $table->foreignId('blog_post_id')
-        ->constrained()
-        ->onDelete('cascade');
-    });
-  }
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('comments', function (Blueprint $table) {
+            $table->dropMorphs('commentable');
+            $table->unsignedBigInteger('blog_post_id')->index()->nullable();
+            $table->foreign('blog_post_id')->references('id')->on('blog_posts');
+        });
+    }
 }
