@@ -3,5 +3,5 @@
 @section('title', 'Home page')
 
 @section('content')
-  <h1>Home Page</h1>
+<h1>{{ __('Welcome to Laravel!') }}</h1>
 @endsection
