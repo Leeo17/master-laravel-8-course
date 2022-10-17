@@ -9,7 +9,8 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
 
     public const LOCALES = [
         'en' => 'English',
@@ -35,6 +36,12 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'email',
+        'email_verified_at',
+        'created_at',
+        'updated_at',
+        'is_admin',
+        'locale'
     ];
 
     /**
