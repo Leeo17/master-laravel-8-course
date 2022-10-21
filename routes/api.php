@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\V1\LoginController;
+use App\Http\Controllers\Api\V1\PostCommentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +16,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::prefix('v1')->name('api.v1.')->group(function () {
+    Route::apiResource('posts.comments', PostCommentController::class)->middleware('auth:sanctum');
+    Route::post('login', [LoginController::class, 'login'])->name('login');
+    Route::post('logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth:sanctum');
+});
+
+Route::fallback(function () {
+    return response()->json([
+        'message' => 'Not found'
+    ], 404);
+})->name('api.fallback');

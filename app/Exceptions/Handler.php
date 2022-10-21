@@ -2,7 +2,12 @@
 
 namespace App\Exceptions;
 
+use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -31,10 +36,27 @@ class Handler extends ExceptionHandler
      *
      * @return void
      */
+
     public function register()
     {
         $this->reportable(function (Throwable $e) {
-            //
+                //
+        });
+
+        $this->renderable(function (NotFoundHttpException $exception, $request) {
+            if ($request->expectsJson()) {
+                return Route::respondWithRoute('api.fallback');
+            }
+            return parent::render($request, $exception);
+        });
+
+        $this->renderable(function (AccessDeniedHttpException $exception, $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $exception->getMessage(),
+                ], 403);
+            }
+            return parent::render($request, $exception);
         });
     }
 }
