@@ -8,6 +8,7 @@ use App\Http\Requests\StorePost;
 use App\Models\BlogPost;
 use App\Models\Image;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class PostsController extends Controller
@@ -94,11 +95,7 @@ class PostsController extends Controller
     {
         $post = BlogPost::findOrFail($id);
 
-        // if (Gate::denies('posts.update', $post)) {
-        //   abort(403, "You can't edit this blog post");
-        // }
-
-        $this->authorize($post);
+        $this->authorize('update', $post);
 
         return view('posts.edit', ['post' => $post]);
     }
@@ -114,7 +111,10 @@ class PostsController extends Controller
     {
         $post = BlogPost::findOrFail($id);
 
-        $this->authorize($post);
+        $response = Gate::inspect('update', $post);
+        if (!$response->allowed()) {
+            abort(403, 'User not allowed to update this post!');
+        }
 
         $validated = $request->validated();
 
@@ -148,11 +148,10 @@ class PostsController extends Controller
     {
         $post = BlogPost::findOrFail($id);
 
-        // if (Gate::denies('posts.delete', $post)) {
-        //   abort(403, "You can't delete this blog post");
-        // }
-
-        $this->authorize($post);
+        $response = Gate::inspect('delete', $post);
+        if (!$response->allowed()) {
+            abort(403, 'User not allowed to delete this post!');
+        }
 
         $post->delete();
 
